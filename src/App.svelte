@@ -16,25 +16,24 @@
 	  }
 	};
   
+	const updatePage = (newPage) => {
+	  pageParam.set(newPage);
+	  fetchImageData(newPage);
+	};
+  
 	const nextPage = () => {
-	  pageParam.update((value) => {
-		const newPage = value + 1;
-		fetchImageData(newPage);
-		window.history.pushState({}, "", `?page=${newPage}`);
-		scrollToTop();
-		return newPage;
-	  });
+	  const newPage = currentPage + 1;
+	  window.history.pushState({}, "", `?page=${newPage}`);
+	  scrollToTop();
+	  updatePage(newPage);
 	};
   
 	const prevPage = () => {
 	  if (currentPage > 1) {
-		pageParam.update((value) => {
-		  const newPage = value - 1;
-		  fetchImageData(newPage);
-		  window.history.pushState({}, "", `?page=${newPage}`);
-		  scrollToTop();
-		  return newPage;
-		});
+		const newPage = currentPage - 1;
+		window.history.pushState({}, "", `?page=${newPage}`);
+		scrollToTop();
+		updatePage(newPage);
 	  }
 	};
   
@@ -43,20 +42,16 @@
 	};
   
 	onMount(() => {
-	  const paramsSubscription = pageParam.subscribe((value) => {
-		currentPage = value;
-		fetchImageData(value);
-	  });
+	  const initialPage = parseInt(new URLSearchParams(window.location.search).get("page") || currentPage, 10);
+	  updatePage(initialPage);
   
 	  window.addEventListener("popstate", () => {
-		pageParam.set(parseInt(new URLSearchParams(window.location.search).get("page") || currentPage, 10));
+		const newPage = parseInt(new URLSearchParams(window.location.search).get("page") || currentPage, 10);
+		updatePage(newPage);
 	  });
   
 	  onDestroy(() => {
-		paramsSubscription();
-		window.removeEventListener("popstate", () => {
-		  pageParam.set(parseInt(new URLSearchParams(window.location.search).get("page") || currentPage, 10));
-		});
+		window.removeEventListener("popstate", () => {});
 	  });
 	});
   </script>
