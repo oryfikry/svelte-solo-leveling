@@ -17,6 +17,7 @@
 	};
   
 	const updatePage = (newPage) => {
+	  currentPage = newPage;
 	  pageParam.set(newPage);
 	  fetchImageData(newPage);
 	};
